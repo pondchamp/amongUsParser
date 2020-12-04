@@ -209,7 +209,8 @@ class gameSettingsLayer(layerBase):
 		return {
 			'v1': [1, 'BLBffffBBBlBBLLB', ['MaxPlayers', 'Keywords', 'MapId', 'PlayerSpeedMod', 'CrewLightMod', 'ImpostorLightMod', 'KillCooldown', 'NumCommonTasks', 'NumLongTasks', 'NumShortTasks', 'NumEmergencyMeetings', 'NumImpostors', 'KillDistance', 'DiscussionTime', 'VotingTime', 'IsDefaults'], False],
 			'v2': [2, 'BLBffffBBBlBBLLBB', ['MaxPlayers', 'Keywords', 'MapId', 'PlayerSpeedMod', 'CrewLightMod', 'ImpostorLightMod', 'KillCooldown', 'NumCommonTasks', 'NumLongTasks', 'NumShortTasks', 'NumEmergencyMeetings', 'NumImpostors', 'KillDistance', 'DiscussionTime', 'VotingTime', 'IsDefaults', 'EmergencyCooldown'], False],
-			'v3': [3, 'BLBffffBBBlBBLLBBBB', ['MaxPlayers', 'Keywords', 'MapId', 'PlayerSpeedMod', 'CrewLightMod', 'ImpostorLightMod', 'KillCooldown', 'NumCommonTasks', 'NumLongTasks', 'NumShortTasks', 'NumEmergencyMeetings', 'NumImpostors', 'KillDistance', 'DiscussionTime', 'VotingTime', 'IsDefaults', 'EmergencyCooldown', 'ConfirmImpostor', 'VisualTasks'], False]
+			'v3': [3, 'BLBffffBBBlBBLLBBBB', ['MaxPlayers', 'Keywords', 'MapId', 'PlayerSpeedMod', 'CrewLightMod', 'ImpostorLightMod', 'KillCooldown', 'NumCommonTasks', 'NumLongTasks', 'NumShortTasks', 'NumEmergencyMeetings', 'NumImpostors', 'KillDistance', 'DiscussionTime', 'VotingTime', 'IsDefaults', 'EmergencyCooldown', 'ConfirmImpostor', 'VisualTasks'], False],
+			'v4': [4, 'BLBffffBBBlBBLLBBBB', ['MaxPlayers', 'Keywords', 'MapId', 'PlayerSpeedMod', 'CrewLightMod', 'ImpostorLightMod', 'KillCooldown', 'NumCommonTasks', 'NumLongTasks', 'NumShortTasks', 'NumEmergencyMeetings', 'NumImpostors', 'KillDistance', 'DiscussionTime', 'VotingTime', 'IsDefaults', 'EmergencyCooldown', 'ConfirmImpostor', 'VisualTasks', 'Anonymous Voting', 'Task Bar Updates'], False]
 		}
 
 	def settings(self):
