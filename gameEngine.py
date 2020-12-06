@@ -323,10 +323,13 @@ class gameState:
 					self.meetingStartedBy = self.entities[parentCommandNode.props["ownerId"]].owner
 					self.meetingStartedAt = self.time
 					reportId = parentNode.children[0].props["playerId"]
-					self.meetingReason = "Button" if reportId == 255 else reportId ## Will be "Button" or the entity of a murdered player
+					self.meetingReason = "Button" if reportId == 255 else reportId
 					self.gsCallback('StartMeeting')
 
 				if commandNode.commandName == "Close": ## The meeting is closing
+					self.meetingStartedBy = False
+					self.meetingStartedAt = False
+					self.meetingReason = False
 					self.gsCallback('EndMeeting')
 
 				if commandNode.commandName == "VotingComplete": ## Meeting voting results
