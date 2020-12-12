@@ -320,7 +320,8 @@ class gameState:
 					self.gsCallback('GameSettings')
 
 				if commandNode.commandName == "StartMeeting": ## meeting just started, players have been moved
-					self.meetingStartedBy = self.entities[parentCommandNode.props["ownerId"]].owner
+					if parentCommandNode.props["ownerId"] in self.entities:
+						self.meetingStartedBy = self.entities[parentCommandNode.props["ownerId"]].owner
 					self.meetingStartedAt = self.time
 					reportId = parentNode.children[0].props["playerId"]
 					self.meetingReason = "Button" if reportId == 255 else reportId
