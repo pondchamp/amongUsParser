@@ -47,7 +47,7 @@ class layerBase:
 					self.commandLeafs[child] = commandChild
 		except:
 			self.handleError()
-			print("LAYER ERROR", self.name)
+			# print("LAYER ERROR", self.name)
 
 	def structUnpack(self, structure, myPayload):
 		output = []
@@ -202,7 +202,7 @@ class layerBase:
 	
 
 	def handleError(self):
-		self.errorFlag = 1;
+		self.errorFlag = 1
 		#die() ## switch on to pull out errors
 
 class commandLeaf(layerBase):
