@@ -41,7 +41,8 @@ class playerClass:
 
 	def __getstate__(self):
 		state = self.__dict__.copy()
-		del state["gameState"]
+		if "gameState" in state:
+			del state["gameState"]
 		return state
 
 	def __setstate__(self, state):
@@ -299,7 +300,6 @@ class gameState:
 
 				if commandNode.commandName == "JoinedGame": ## Joined lobby, reset game state
 					self.reset()
-					self.gameId = commandNode.props["gameId"]
 					self.selfClientID = commandNode.props["clientId"]
 					self.hostClientID = commandNode.props["hostclientId"]
 					self.gsCallback('JoinedGame')
@@ -482,4 +482,5 @@ class gameState:
 			if isinstance(parentNode, spawnSubcommandLayer):
 				pass ## DO NOT HANDLE HERE!!!
 
-	
+			if "gameId" in commandNode.props:
+				self.gameId = commandNode.props["gameId"]
