@@ -163,6 +163,7 @@ class gameState:
 			cb(dataDict)
 
 	def gsCallback(self, name): # Convience function for game state update callbacks
+		self.callback('Event', {'gameState': self, 'player': None})
 		self.callback(name, {'gameState': self, 'player': None})
 
 	def reset(self):

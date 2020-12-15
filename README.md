@@ -50,6 +50,7 @@ Game engine callbacks
 
 List of game engine callbacks
 
+	Event (all callbacks)
 	Player updated
 		Exiled
 		Murdered
