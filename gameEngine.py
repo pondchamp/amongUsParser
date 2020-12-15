@@ -6,36 +6,37 @@ from .layers import commandLeaf, hazilLayer, innerLayer, gameDataLayer, rpcLayer
 from .helpers import flatten
 
 import struct
+from typing import Union, Any, Dict, List
 
 
-class playerClass:
-    def __init__(self, inputGameState):
-        self.clientId = False
-        self.playerId = -1
+class PlayerClass:
+    def __init__(self, input_game_state):
+        self.clientId: Union[bool, Any] = False
+        self.playerId: int = -1
 
-        self.color = False
-        self.name = False
-        self.skin = 0
-        self.hat = 0
-        self.pet = 0
+        self.color: Union[bool, Any] = False
+        self.name: Union[bool, Any] = False
+        self.skin: int = 0
+        self.hat: int = 0
+        self.pet: int = 0
 
-        self.alive = True
-        self.infected = False
+        self.alive: bool = True
+        self.infected: bool = False
 
-        self.entities = {}
-        self.playerControlNetId = False  # 1
-        self.playerPhysicsNetId = False  # 2
-        self.networkTransformNetId = False  # 3
+        self.entities: Dict[Any] = {}
+        self.playerControlNetId: Union[bool, Any] = False  # 1
+        self.playerPhysicsNetId: Union[bool, Any] = False  # 2
+        self.networkTransformNetId: Union[bool, Any] = False  # 3
 
-        self.gameState = inputGameState
+        self.game_state: GameEngine = input_game_state
 
-        self.gameDataEntities = []
+        self.gameDataEntities: List[Any] = []
 
-        self.lastMoveSeq = -1  # Tracking player movement sequence numbers
-        self.x = 0
-        self.y = 0
+        self.lastMoveSeq: int = -1  # Tracking player movement sequence numbers
+        self.x: int = 0
+        self.y: int = 0
 
-        self.inVent = False  # Is player currently in the vents?
+        self.in_vent: bool = False  # Is player currently in the vents?
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -46,24 +47,25 @@ class playerClass:
     def __setstate__(self, state):
         self.__dict__.update(state)
 
-    def callback(self, callbackName):  # Convenience function to shorten callback updates
-        self.gameState.callback(callbackName, {'gameState': self.gameState, 'player': self})
+    def callback(self, callback_name):  # Convenience function to shorten callback updates
+        self.game_state.callback(callback_name, {'gameState': self.game_state, 'player': self})
 
-    def snapTo(self, ix, iy, seq):
+    def snap_to(self, ix, iy, seq):
         if seq > self.lastMoveSeq:
             x = (ix - 32767)  # Offset to center of maps
             y = (iy - 32767)  # Offset to center of maps
             self.x = x
             self.y = y
 
-    def parseLocation(self, data):
+    def parse_location(self, data):
+        seq = ix = iy = x_speed = y_speed = None
         if len(data) == 10:  # Alive movement
-            seq, ix, iy, xSpeed, ySpeed = struct.unpack("<HHHHH", data)
+            seq, ix, iy, x_speed, y_speed = struct.unpack("<HHHHH", data)
         if len(data) == 6:  # Ghost movement
             seq, ix, iy = struct.unpack("<HHH", data)
-            xSpeed, ySpeed = 0, 0  # Ehh, it works I guess
+            x_speed, y_speed = 0, 0  # Ehh, it works I guess
 
-        if not (len(data) == 6 or len(data) == 10):  ## Bad data?
+        if not (len(data) == 6 or len(data) == 10):  # Bad data?
             return False, False
 
         if seq > self.lastMoveSeq:
@@ -80,8 +82,8 @@ class playerClass:
             return self.x, self.y
         return False, False
 
-    def vent(self, inVent):
-        self.inVent = inVent
+    def vent(self, in_vent: bool):
+        self.in_vent = in_vent
 
     def exiled(self):
         self.alive = False
@@ -95,47 +97,47 @@ class playerClass:
         self.callback("Murder")
         player.murdered()
 
-    def setSkin(self, skinId):
-        self.skin = skinId
+    def set_skin(self, skin_id):
+        self.skin = skin_id
         self.callback("SetSkin")
 
-    def setHat(self, hatId):
-        self.hat = hatId
+    def set_hat(self, hat_id):
+        self.hat = hat_id
         self.callback("SetHat")
 
-    def setPet(self, petId):
-        self.pet = petId
+    def set_pet(self, pet_id):
+        self.pet = pet_id
         self.callback("SetPet")
 
-    def setColor(self, colorId):
-        self.color = colorId
+    def set_color(self, color_id):
+        self.color = color_id
         self.callback("SetColor")
 
-    def setInfected(self, isInfected):
-        self.infected = isInfected
+    def set_infected(self, is_infected):
+        self.infected = is_infected
         self.callback("Infected")
 
-    def assignId(self, playerId):
-        self.playerId = playerId
-        self.gameState.registerPlayerId(self, self.playerId)
+    def assign_id(self, player_id):
+        self.playerId = player_id
+        self.game_state.register_player_id(self, self.playerId)
         try:
-            preName = self.gameState.usernameLookup[playerId]
+            pre_name = self.game_state.usernameLookup[player_id]
             if not self.name:
-                self.setName(preName)
+                self.set_name(pre_name)
         except:
             pass
 
     def chat(self, message):
-        self.gameState.callback('Chat', {'gameState': self.gameState, 'player': self, 'message': message})
+        self.game_state.callback('Chat', {'gameState': self.game_state, 'player': self, 'message': message})
 
-    def setUsernameFromList(self, name):
-        self.setName(name)
+    def set_username_from_list(self, name):
+        self.set_name(name)
 
-    def setName(self, name):
+    def set_name(self, name):
         self.name = name
         self.callback("SetName")
 
-    def addEntity(self, entity):
+    def add_entity(self, entity):
         if entity.netId not in self.entities:
             self.entities[entity.netId] = entity
             return True
@@ -143,21 +145,21 @@ class playerClass:
 
 
 # noinspection PyAttributeOutsideInit
-class entityClass:
-    def __init__(self, netId):
-        self.netId = netId
+class EntityClass:
+    def __init__(self, net_id):
+        self.netId = net_id
 
-    def addToPlayer(self, player):
-        if player.addEntity(self):
+    def add_to_player(self, player):
+        if player.add_entity(self):
             self.owner = player
             return True
         return False
 
 
-# noinspection PyAttributeOutsideInit
-class gameState:
-    def __init__(self, callbackDict={}):
-        self.callbackDict = callbackDict  # dictionary of functions to call back to. Will not reset with game state
+# noinspection PyAttributeOutsideInit,PyUnresolvedReferences
+class GameEngine:
+    def __init__(self, callback_dict=None):
+        self.callbackDict = callback_dict if callback_dict is not None else {}  # Will not reset with game state
         self.reset()
 
     def __getstate__(self):
@@ -168,7 +170,7 @@ class gameState:
     def __setstate__(self, state):
         self.__dict__.update(state)
 
-    def callback(self, name, dataDict):
+    def callback(self, name, data_dict):
         try:
             cb = self.callbackDict[name]
         except:
@@ -176,43 +178,43 @@ class gameState:
             pass  # Callback not registered
         if cb:
             # noinspection PyCallingNonCallable
-            cb(dataDict)
+            cb(data_dict)
 
-    def gsCallback(self, name):  # Convenience function for game state update callbacks
+    def ge_callback(self, name):  # Convenience function for game state update callbacks
         if name != 'Reset':
             self.callback('Event', {'gameState': self, 'player': self})
         self.callback(name, {'gameState': self, 'player': None})
 
     def reset(self):
-        self.gameId = False
-        self.selfClientID = False  # Holds a reference to the network id of the computer we run on
-        self.hostClientID = False  # The client id of the host of the game
-        self.players = {}
-        self.entities = {}
-        self.playerIdMap = {}
-        self.tick = 0
-        self.sendServer = []
-        self.sendClient = []
-        self.storedValue = False
-        self.time = 0  # Stores the current time of the engine
-        self.usernameLookup = {}  # Stores a map of player id's to usernames to pass between spawn calls
-        self.lastSpawnedId = False
-        self.gameHasStarted = False
+        self.gameId: Union[bool, Any] = False
+        self.selfClientID: Union[bool, Any] = False  # Holds a reference to the network id of the computer we run on
+        self.hostClientID: Union[bool, Any] = False  # The client id of the host of the game
+        self.players: Dict[Any] = {}
+        self.entities:  Dict[Any] = {}
+        self.playerIdMap:  Dict[Any] = {}
+        self.tick: Union[bool, Any] = 0
+        self.sendServer: List[Any] = []
+        self.sendClient: List[Any] = []
+        self.storedValue: Union[bool, Any] = False
+        self.time: Union[bool, Any] = 0  # Stores the current time of the engine
+        self.usernameLookup:  Dict[Any] = {}  # Stores a map of player id's to usernames to pass between spawn calls
+        self.lastSpawnedId: Union[bool, Any] = False
+        self.gameHasStarted: Union[bool, Any] = False
 
-        self.meetingStartedBy = False  # player entity who started the last meeting
-        self.meetingStartedAt = False  # Time it started at
-        self.meetingReason = False  # Will be "Button" or the entity of a murdered player
+        self.meetingStartedBy: Union[bool, Any] = False  # player entity who started the last meeting
+        self.meetingStartedAt: Union[bool, Any] = False  # Time it started at
+        self.meetingReason: Union[bool, Any] = False  # Will be "Button" or the entity of a murdered player
 
-        self.entityPreload = {}  ## A dict of entities that had data sent to them before proper instantiation
+        self.entityPreload: Dict[Any] = {}  # A dict of entities that had data sent to them before proper instantiation
 
-        self.gameSettings = {}
+        self.gameSettings: Dict[Any] = {}
 
-        self.lobbyEntity = False
+        self.lobbyEntity: Union[bool, Any] = False
 
-        self.gsCallback('Reset')
+        self.ge_callback('Reset')
 
-    def registerPlayerId(self, player, playerId):
-        self.playerIdMap[playerId] = player
+    def register_player_id(self, player, player_id):
+        self.playerIdMap[player_id] = player
 
     def proc(self, data, ts):
         self.time = ts
@@ -221,19 +223,19 @@ class gameState:
         nodes = []
         flatten(tree, nodes)  # Flatten the tree into the nodes
         for node in nodes:  # Process each node individually, can always traverse if needed
-            self.procNode(node)
+            self.proc_node(node)
 
-    def createPlayer(self, clientId):
-        player = playerClass(self)
-        player.clientId = clientId
-        self.players[clientId] = player
+    def create_player(self, client_id):
+        player = PlayerClass(self)
+        player.clientId = client_id
+        self.players[client_id] = player
         return player
 
-    def removePlayer(self, clientId):
+    def remove_player(self, client_id):
         player = None
         try:
-            player = self.players[clientId]
-            del self.players[clientId]
+            player = self.players[client_id]
+            del self.players[client_id]
         except:
             pass  # Player not in player list
 
@@ -252,76 +254,76 @@ class gameState:
         except:
             pass  # Entity removal issue
 
-    def addEntity(self, player, netId):
-        entity = entityClass(netId)
-        if entity.addToPlayer(player):
-            self.entities[netId] = entity
+    def add_entity(self, player, net_id):
+        entity = EntityClass(net_id)
+        if entity.add_to_player(player):
+            self.entities[net_id] = entity
         else:
             del entity  # Duplicates ?
 
-    def spawnEntity(self, ownerNode, commandNode):
-        if ownerNode.commandName == "Player":
-            clientId = ownerNode.props["clientId"]
+    def spawn_entity(self, owner_node, command_node):
+        if owner_node.commandName == "Player":
+            client_id = owner_node.props["clientId"]
             try:
-                player = self.players[clientId]
+                player = self.players[client_id]
             except:
                 # Player not yet instantiated, do so
-                player = self.createPlayer(clientId)
-            self.addEntity(player, commandNode.props["netId"])
+                player = self.create_player(client_id)
+            self.add_entity(player, command_node.props["netId"])
         else:
-            clientId = ownerNode.props["clientId"]
-            if clientId == 4294967294:  # Server Id
-                clientId = "SERVER"
-            netId = commandNode.props["netId"]
-        self.lastSpawnedId = commandNode.props["netId"]
+            client_id = owner_node.props["clientId"]
+            if client_id == 4294967294:  # Server Id
+                client_id = "SERVER"
+            net_id = command_node.props["netId"]
+        self.lastSpawnedId = command_node.props["netId"]
 
-    def procNode(self, commandNode):
-        if isinstance(commandNode, commandLeaf):  # Process command leafs and traverse upward for data where needed
-            parentNode = commandNode.parent
+    def proc_node(self, command_node):
+        if isinstance(command_node, commandLeaf):  # Process command leafs and traverse upward for data where needed
+            parent_node = command_node.parent
             # Hazil
-            if isinstance(parentNode, hazilLayer):
-                if commandNode.commandName == "Hello":
+            if isinstance(parent_node, hazilLayer):
+                if command_node.commandName == "Hello":
                     pass
             # Inner Net
-            if isinstance(parentNode, innerLayer):
-                if commandNode.commandName == "RemovePlayer":
-                    removedClientID = commandNode.props["ownerId"]
-                    self.removePlayer(removedClientID)
+            if isinstance(parent_node, innerLayer):
+                if command_node.commandName == "RemovePlayer":
+                    removed_client_id = command_node.props["ownerId"]
+                    self.remove_player(removed_client_id)
 
-                if commandNode.commandName == "StartGame":
+                if command_node.commandName == "StartGame":
                     self.gameHasStarted = True
-                    self.gsCallback('StartGame')
+                    self.ge_callback('StartGame')
 
-                if commandNode.commandName == "EndGame":
-                    self.gsCallback('EndGame')
+                if command_node.commandName == "EndGame":
+                    self.ge_callback('EndGame')
                     self.reset()
 
-                if commandNode.commandName == "JoinedGame":  # Joined lobby, reset game state
+                if command_node.commandName == "JoinedGame":  # Joined lobby, reset game state
                     self.reset()
-                    self.selfClientID = commandNode.props["clientId"]
-                    self.hostClientID = commandNode.props["hostclientId"]
-                    self.gsCallback('JoinedGame')
+                    self.selfClientID = command_node.props["clientId"]
+                    self.hostClientID = command_node.props["hostclientId"]
+                    self.ge_callback('JoinedGame')
 
             # Game Data  Layer
-            if isinstance(parentNode, gameDataLayer):
-                if commandNode.commandName == "Data":
-                    ownerId = commandNode.props["ownerId"]
+            if isinstance(parent_node, gameDataLayer):
+                if command_node.commandName == "Data":
+                    owner_id = command_node.props["ownerId"]
                     try:
-                        entity = self.entities[ownerId]
+                        entity = self.entities[owner_id]
                         player = entity.owner
                     except:
                         player = False
                     if player:
-                        if ownerId == player.networkTransformNetId:  ## Data addressed to player move handler!
-                            player.parseLocation(commandNode.props["data"])
+                        if owner_id == player.networkTransformNetId:  ## Data addressed to player move handler!
+                            player.parseLocation(command_node.props["data"])
 
             # RPC
-            if isinstance(parentNode, rpcLayer):
-                parentCommandNode = parentNode.parent.commandLeafs[parentNode]
-                ownerId = parentCommandNode.props["ownerId"]
+            if isinstance(parent_node, rpcLayer):
+                parent_command_node = parent_node.parent.commandLeafs[parent_node]
+                owner_id = parent_command_node.props["ownerId"]
                 try:
-                    entity = self.entities[ownerId]
-                    player = entity.owner
+                    entity = self.entities[owner_id]
+                    player: Union[bool, Any] = entity.owner
                 except:
                     player = False
                 # Traffic sent before player spawn (ALSO OTHER UNKNOWN TRAFFIC?)
@@ -330,121 +332,122 @@ class gameState:
                 # We do not need a player for these commands
                 #
 
-                if commandNode.commandName == "SyncSettings":  # Set game settings (no player needed)
-                    self.gameSettings = parentNode.children[1].children[0].props
-                    self.gsCallback('GameSettings')
+                if command_node.commandName == "SyncSettings":  # Set game settings (no player needed)
+                    self.gameSettings = parent_node.children[1].children[0].props
+                    self.ge_callback('GameSettings')
 
-                if commandNode.commandName == "StartMeeting":  # meeting just started, players have been moved
-                    if parentCommandNode.props["ownerId"] in self.entities:
-                        self.meetingStartedBy = self.entities[parentCommandNode.props["ownerId"]].owner
+                if command_node.commandName == "StartMeeting":  # meeting just started, players have been moved
+                    if parent_command_node.props["ownerId"] in self.entities:
+                        self.meetingStartedBy = self.entities[parent_command_node.props["ownerId"]].owner
                     self.meetingStartedAt = self.time
-                    reportId = parentNode.children[0].props["playerId"]
-                    self.meetingReason = "Button" if reportId == 255 else reportId
-                    self.gsCallback('StartMeeting')
+                    report_id = parent_node.children[0].props["playerId"]
+                    self.meetingReason = "Button" if report_id == 255 else report_id
+                    self.ge_callback('StartMeeting')
 
-                if commandNode.commandName == "Close":  # The meeting is closing
+                if command_node.commandName == "Close":  # The meeting is closing
                     self.meetingStartedBy = False
                     self.meetingStartedAt = False
                     self.meetingReason = False
-                    self.gsCallback('EndMeeting')
+                    self.ge_callback('EndMeeting')
 
-                if commandNode.commandName == "VotingComplete":  # Meeting voting results
-                    exilePlayer = False
-                    if commandNode.props['exiledPlayerId'] < 255:
+                if command_node.commandName == "VotingComplete":  # Meeting voting results
+                    exile_player = False
+                    if command_node.props['exiledPlayerId'] < 255:
                         try:
-                            exilePlayer = self.playerIdMap[commandNode.props['exiledPlayerId']]
+                            exile_player = self.playerIdMap[command_node.props['exiledPlayerId']]
                         except:
                             pass  # Exiled player not found
-                    if exilePlayer:
-                        exilePlayer.exiled()
+                    if exile_player:
+                        exile_player.exiled()
 
                 if not player:  # If we don't have a player instantiated yet
                     try:
-                        self.entityPreload[ownerId]  # Check if we have established a preload for this entity
+                        self.entityPreload[owner_id]  # Check if we have established a preload for this entity
                     except:
-                        self.entityPreload[ownerId] = []  # Establish one if not
-                    self.entityPreload[ownerId].append(
-                        commandNode)  # Save command, We will rerun these commands if we see the entity spawn
+                        self.entityPreload[owner_id] = []  # Establish one if not
+                    self.entityPreload[owner_id].append(
+                        command_node)  # Save command, We will rerun these commands if we see the entity spawn
 
                 #
                 # We need a player object for these commands to make sense
                 #
 
                 if player:
-                    if commandNode.commandName == "EnterVent":
+                    if command_node.commandName == "EnterVent":
                         player.vent(True)
-                    if commandNode.commandName == "ExitVent":
+                    if command_node.commandName == "ExitVent":
                         player.vent(False)
 
-                    if commandNode.commandName == "SnapTo":
-                        player.snapTo(commandNode.props["x"], commandNode.props["y"], commandNode.props["seq"])
+                    if command_node.commandName == "SnapTo":
+                        player.snapTo(command_node.props["x"], command_node.props["y"], command_node.props["seq"])
 
-                    if commandNode.commandName == "MurderPlayer":
-                        murderedNetId = commandNode.props["netId"]
-                        murderedEntity = self.entities[murderedNetId]
-                        murderedPlayer = murderedEntity.owner
-                        player.murder(murderedPlayer)  ## Do the murder
+                    if command_node.commandName == "MurderPlayer":
+                        murdered_net_id = command_node.props["netId"]
+                        murdered_entity = self.entities[murdered_net_id]
+                        murdered_player = murdered_entity.owner
+                        player.murder(murdered_player)  # Do the murder
 
-                    if commandNode.commandName == "SetName":
-                        player.setName(commandNode.props["name"])
-                    if commandNode.commandName == "SetSkin":
-                        player.setSkin(commandNode.props['id'])
-                    if commandNode.commandName == "SetHat":
-                        player.setHat(commandNode.props['id'])
-                    if commandNode.commandName == "SetColor":
-                        player.setColor(commandNode.props['id'])
-                    if commandNode.commandName == "SetPet":
-                        player.setPet(commandNode.props['id'])
+                    if command_node.commandName == "SetName":
+                        player.setName(command_node.props["name"])
+                    if command_node.commandName == "SetSkin":
+                        player.setSkin(command_node.props['id'])
+                    if command_node.commandName == "SetHat":
+                        player.setHat(command_node.props['id'])
+                    if command_node.commandName == "SetColor":
+                        player.setColor(command_node.props['id'])
+                    if command_node.commandName == "SetPet":
+                        player.setPet(command_node.props['id'])
 
-                    if commandNode.commandName == "SetInfected":
-                        for playerId in commandNode.props['playerIdList']:
-                            self.playerIdMap[playerId].setInfected(True)
+                    if command_node.commandName == "SetInfected":
+                        for player_id in command_node.props['playerIdList']:
+                            self.playerIdMap[player_id].set_infected(True)
 
-                    if commandNode.commandName == "SendChat":
-                        message = commandNode.props["message"]
+                    if command_node.commandName == "SendChat":
+                        message = command_node.props["message"]
                         player.chat(message)
 
             # Game data style player update
-            if isinstance(parentNode, UpdateGameDataLayer):
-                if commandNode.commandName == "Player":
+            if isinstance(parent_node, UpdateGameDataLayer):
+                if command_node.commandName == "Player":
                     try:
-                        player = self.playerIdMap[commandNode.props["PlayerId"]]
+                        player = self.playerIdMap[command_node.props["PlayerId"]]
                     except:
                         # Game data update no player
                         return
 
-                    player.setName(commandNode.props["PlayerName"])
-                    player.setSkin(commandNode.props['SkinId'])
-                    player.setHat(commandNode.props['HatId'])
-                    player.setColor(commandNode.props['ColorId'])
-                    player.setPet(commandNode.props['PetId'])
+                    player.set_name(command_node.props["PlayerName"])
+                    player.set_skin(command_node.props['SkinId'])
+                    player.set_hat(command_node.props['HatId'])
+                    player.set_color(command_node.props['ColorId'])
+                    player.set_pet(command_node.props['PetId'])
 
             # Entity spawn
-            if isinstance(parentNode, spawnLayer):
-                if commandNode.commandName == "Lobby":
+            if isinstance(parent_node, spawnLayer):
+                if command_node.commandName == "Lobby":
                     if not self.lobbyEntity:
-                        self.lobbyEntity = parentNode.children[1].children[0].props['netId']
+                        self.lobbyEntity = parent_node.children[1].children[0].props['netId']
                     else:
                         pass  # Happens when we read our own fake lobby spawns
-                if commandNode.commandName == "Player":
+                if command_node.commandName == "Player":
                     # Player spawn
-                    for child in parentNode.children[1].children:
-                        self.spawnEntity(commandNode, child)
+                    for child in parent_node.children[1].children:
+                        self.spawn_entity(command_node, child)
                     # Player will exist at this point
-                    player = self.players[commandNode.props["clientId"]]
-                    playerControl, playerPhysics, networkTransform = parentNode.children[1].children
+                    player = self.players[command_node.props["clientId"]]
+                    player_control, player_physics, network_transform = parent_node.children[1].children
 
                     # Pull out the player id from the data sent on the player control spawn
-                    u1, playerId = struct.unpack("BB", playerControl.props['data'])
-                    player.assignId(playerId)
+                    u1, player_id = struct.unpack("BB", player_control.props['data'])
+                    player.assign_id(player_id)
 
                     # Store the network id's of the player entities
-                    player.playerControlNetId = playerControl.props[
+                    player.playerControlNetId = player_control.props[
                         'netId']  # Player control entity for the player (handles most actions)
-                    player.playerPhysicsNetId = playerPhysics.props['netId']  ## Handles SnapTo
-                    player.networkTransformNetId = networkTransform.props['netId']  ## Movement handler
+                    player.playerPhysicsNetId = player_physics.props['netId']  ## Handles SnapTo
+                    player.networkTransformNetId = network_transform.props['netId']  ## Movement handler
 
-                    # Sometimes commands are sent to entities pre spawn. We keep these and rerun them when the spawn happens
+                    # Sometimes commands are sent to entities pre spawn
+                    # We keep these and rerun them when the spawn happens
 
                     for netId in [player.playerControlNetId, player.playerPhysicsNetId, player.networkTransformNetId]:
                         try:
@@ -453,31 +456,31 @@ class gameState:
                         except:
                             commands = []
                         for rerunNode in commands:
-                            self.procNode(rerunNode)  # Rerun the commands sent before spawn
+                            self.proc_node(rerunNode)  # Rerun the commands sent before spawn
 
-                if commandNode.commandName == "GameData":
-                    for child in parentNode.children[1].children:
-                        self.spawnEntity(commandNode, child)
-                    a1, a2 = parentNode.children[1].children  # Arguments 1 and 2? (guessing at what to call it)
-                    self.gameDataEnties = [a1.props['netId'], a2.props['netId']]
-                    userCount = a1.props['data'][0]
+                if command_node.commandName == "GameData":
+                    for child in parent_node.children[1].children:
+                        self.spawn_entity(command_node, child)
+                    a1, a2 = parent_node.children[1].children  # Arguments 1 and 2? (guessing at what to call it)
+                    self.gameDataEntities = [a1.props['netId'], a2.props['netId']]
+                    user_count = a1.props['data'][0]
                     buffer = a1.props['data'][1:]
-                    for i in range(userCount):
-                        playerId = buffer[0]
+                    for i in range(user_count):
+                        player_id = buffer[0]
                         buffer = buffer[1:]
                         slen = buffer[0]
                         buffer = buffer[1:]
-                        userName = buffer[0:slen]
+                        user_name = buffer[0:slen]
                         buffer = buffer[slen:]
                         u1, u2 = struct.unpack("<LH", buffer[0:6])
                         buffer = buffer[6:]
-                        self.usernameLookup[playerId] = userName
+                        self.usernameLookup[player_id] = user_name
                         for clientId in self.players.keys():
                             player = self.players[clientId]
-                            if player.playerId == playerId:
-                                player.setUsernameFromList(userName)
-            if isinstance(parentNode, spawnSubcommandLayer):
+                            if player.playerId == player_id:
+                                player.set_username_from_list(user_name)
+            if isinstance(parent_node, spawnSubcommandLayer):
                 pass  # DO NOT HANDLE HERE!!!
 
-            if "gameId" in commandNode.props:
-                self.gameId = commandNode.props["gameId"]
+            if "gameId" in command_node.props:
+                self.gameId = command_node.props["gameId"]
