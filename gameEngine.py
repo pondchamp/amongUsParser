@@ -39,6 +39,14 @@ class playerClass:
 
 		self.inVent = False ## Is player currently in the vents?
 
+	def __getstate__(self):
+		state = self.__dict__.copy()
+		del state["gameState"]
+		return state
+
+	def __setstate__(self, state):
+		self.__dict__.update(state)
+
 	def callback(self, callbackName): # Convience function to shorten callback updates
 		self.gameState.callback(callbackName, {'gameState': self.gameState, 'player': self})
 
@@ -152,6 +160,14 @@ class gameState:
 	def __init__(self, callbackDict={}):
 		self.callbackDict = callbackDict ## dictionary of functions to call back to. Will not reset with game state
 		self.reset()
+
+	def __getstate__(self):
+		state = self.__dict__.copy()
+		del state["callbackDict"]
+		return state
+
+	def __setstate__(self, state):
+		self.__dict__.update(state)
 
 	def callback(self, name, dataDict):
 		try:
