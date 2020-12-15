@@ -174,12 +174,13 @@ class gameState:
 			cb = self.callbackDict[name]
 		except:
 			cb = False
-			pass ## Callback not registered
+			pass  ## Callback not registered
 		if cb:
 			cb(dataDict)
 
-	def gsCallback(self, name): # Convience function for game state update callbacks
-		self.callback('Event', {'gameState': self, 'player': None})
+	def gsCallback(self, name):  # Convenience function for game state update callbacks
+		if name != 'Reset':
+			self.callback('Event', {'gameState': self, 'player': self})
 		self.callback(name, {'gameState': self, 'player': None})
 
 	def reset(self):
