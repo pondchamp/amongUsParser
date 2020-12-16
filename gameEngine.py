@@ -380,7 +380,7 @@ class GameEngine:
                         player.vent(False)
 
                     if command_node.commandName == "SnapTo":
-                        player.snapTo(command_node.props["x"], command_node.props["y"], command_node.props["seq"])
+                        player.snap_to(command_node.props["x"], command_node.props["y"], command_node.props["seq"])
 
                     if command_node.commandName == "MurderPlayer":
                         murdered_net_id = command_node.props["netId"]
