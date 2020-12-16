@@ -164,7 +164,8 @@ class GameEngine:
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state["callbackDict"]
+        if "callbackDict" in state:
+            del state["callbackDict"]
         return state
 
     def __setstate__(self, state):
@@ -315,7 +316,7 @@ class GameEngine:
                         player = False
                     if player:
                         if owner_id == player.networkTransformNetId:  ## Data addressed to player move handler!
-                            player.parseLocation(command_node.props["data"])
+                            player.parse_location(command_node.props["data"])
 
             # RPC
             if isinstance(parent_node, rpcLayer):
@@ -388,15 +389,15 @@ class GameEngine:
                         player.murder(murdered_player)  # Do the murder
 
                     if command_node.commandName == "SetName":
-                        player.setName(command_node.props["name"])
+                        player.set_name(command_node.props["name"])
                     if command_node.commandName == "SetSkin":
-                        player.setSkin(command_node.props['id'])
+                        player.set_skin(command_node.props['id'])
                     if command_node.commandName == "SetHat":
-                        player.setHat(command_node.props['id'])
+                        player.set_hat(command_node.props['id'])
                     if command_node.commandName == "SetColor":
-                        player.setColor(command_node.props['id'])
+                        player.set_color(command_node.props['id'])
                     if command_node.commandName == "SetPet":
-                        player.setPet(command_node.props['id'])
+                        player.set_pet(command_node.props['id'])
 
                     if command_node.commandName == "SetInfected":
                         for player_id in command_node.props['playerIdList']:
