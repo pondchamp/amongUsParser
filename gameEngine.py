@@ -340,6 +340,7 @@ class GameEngine:
                     self.ge_callback('GameSettings')
 
                 if command_node.commandName == "StartMeeting":  # meeting just started, players have been moved
+                    self.gameHasStarted = True
                     if parent_command_node.props["ownerId"] in self.entities:
                         self.meetingStartedBy = self.entities[parent_command_node.props["ownerId"]].owner
                     self.meetingStartedAt = self.time
@@ -348,12 +349,14 @@ class GameEngine:
                     self.ge_callback('StartMeeting')
 
                 if command_node.commandName == "Close":  # The meeting is closing
+                    self.gameHasStarted = True
                     self.meetingStartedBy = False
                     self.meetingStartedAt = False
                     self.meetingReason = False
                     self.ge_callback('EndMeeting')
 
                 if command_node.commandName == "VotingComplete":  # Meeting voting results
+                    self.gameHasStarted = True
                     exile_player = False
                     if command_node.props['exiledPlayerId'] < 255:
                         try:
