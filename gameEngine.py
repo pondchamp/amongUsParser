@@ -181,10 +181,10 @@ class GameEngine:
             # noinspection PyCallingNonCallable
             cb(data_dict)
 
-    def ge_callback(self, name):  # Convenience function for game state update callbacks
+    def ge_callback(self, name, player=None):  # Convenience function for game state update callbacks
         if name != 'Reset':
-            self.callback('Event', {'gameState': self, 'player': self})
-        self.callback(name, {'gameState': self, 'player': None})
+            self.callback('Event', {'gameState': self, 'player': player})
+        self.callback(name, {'gameState': self, 'player': player})
 
     def reset(self):
         self.gameId: Union[bool, Any] = False
@@ -289,8 +289,9 @@ class GameEngine:
             if isinstance(parent_node, innerLayer):
                 if command_node.commandName == "RemovePlayer":
                     removed_client_id = command_node.props["ownerId"]
+                    removed_player = self.players[removed_client_id]
                     self.remove_player(removed_client_id)
-                    self.ge_callback('RemovePlayer')
+                    self.ge_callback('RemovePlayer', player=removed_player.playerId)
 
                 if command_node.commandName == "StartGame":
                     self.gameHasStarted = True
