@@ -289,7 +289,7 @@ class GameEngine:
             if isinstance(parent_node, innerLayer):
                 if command_node.commandName == "RemovePlayer":
                     removed_client_id = command_node.props["ownerId"]
-                    removed_player = self.players[removed_client_id]
+                    removed_player = self.players[removed_client_id] if removed_client_id in self.players else None
                     self.remove_player(removed_client_id)
                     self.ge_callback('RemovePlayer', player=removed_player)
 
