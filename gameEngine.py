@@ -403,7 +403,8 @@ class GameEngine:
 
                     if command_node.commandName == "SetInfected":
                         for player_id in command_node.props['playerIdList']:
-                            self.playerIdMap[player_id].set_infected(True)
+                            if player_id in self.playerIdMap:
+                                self.playerIdMap[player_id].set_infected(True)
 
                     if command_node.commandName == "SendChat":
                         message = command_node.props["message"]
