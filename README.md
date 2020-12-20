@@ -71,4 +71,5 @@ List of game engine callbacks
 		GameSettings
 		StartMeeting
 		EndMeeting
+		RemovePlayer
 

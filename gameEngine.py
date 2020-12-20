@@ -290,6 +290,7 @@ class GameEngine:
                 if command_node.commandName == "RemovePlayer":
                     removed_client_id = command_node.props["ownerId"]
                     self.remove_player(removed_client_id)
+                    self.ge_callback('RemovePlayer')
 
                 if command_node.commandName == "StartGame":
                     self.gameHasStarted = True
