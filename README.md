@@ -62,6 +62,7 @@ List of game engine callbacks
 		Infected
 		Chat (contains 'message' param)
 		SetName
+		PlayerMovement
 
 	Game updated
 		Reset

@@ -319,6 +319,7 @@ class GameEngine:
                     if player:
                         if owner_id == player.networkTransformNetId:  ## Data addressed to player move handler!
                             player.parse_location(command_node.props["data"])
+                            self.ge_callback('PlayerMovement')
 
             # RPC
             if isinstance(parent_node, rpcLayer):
