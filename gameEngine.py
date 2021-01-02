@@ -390,6 +390,8 @@ class GameEngine:
 
                     if command_node.commandName == "MurderPlayer":
                         murdered_net_id = command_node.props["netId"]
+                        if murdered_net_id not in self.entities:
+                            return
                         murdered_entity = self.entities[murdered_net_id]
                         murdered_player = murdered_entity.owner
                         player.murder(murdered_player)  # Do the murder
